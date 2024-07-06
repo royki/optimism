@@ -29,6 +29,8 @@ services:
       - "${PWD}/test-jwt-secret.txt:/config/test-jwt-secret.txt"
     environment:
       GETH_MINER_RECOMMIT: 100ms
+    networks:
+      - eth
 
   l2:
     build:
@@ -47,6 +49,8 @@ services:
       - "--authrpc.jwtsecret=/config/test-jwt-secret.txt"
     environment:
       GETH_MINER_RECOMMIT: 100ms
+    networks:
+      - eth
 
   op-node:
     depends_on:
@@ -96,6 +100,8 @@ services:
       - "${PWD}/test-jwt-secret.txt:/config/test-jwt-secret.txt"
       - "${PWD}/../.devnet/rollup.json:/rollup.json"
       - op_log:/op_log
+    networks:
+      - eth
 
   op-proposer:
     depends_on:
@@ -126,6 +132,8 @@ services:
       OP_PROPOSER_METRICS_ENABLED: "true"
       OP_PROPOSER_ALLOW_NON_FINALIZED: "true"
       OP_PROPOSER_RPC_ENABLE_ADMIN: "true"
+    networks:
+      - eth
 
   op-batcher:
     depends_on:
@@ -158,6 +166,8 @@ services:
       OP_BATCHER_PLASMA_ENABLED: "${PLASMA_ENABLED}"
       OP_BATCHER_PLASMA_DA_SERVICE: "${PLASMA_DA_SERVICE}"
       OP_BATCHER_PLASMA_DA_SERVER: "http://da-server:3100"
+    networks:
+      - eth
 
   op-challenger:
     depends_on:
@@ -192,6 +202,8 @@ services:
       OP_CHALLENGER_MNEMONIC: test test test test test test test test test test test junk
       OP_CHALLENGER_HD_PATH: "m/44'/60'/0'/0/4"
       OP_CHALLENGER_NUM_CONFIRMATIONS: 1
+    networks:
+      - eth
 
   da-server:
     image: us-docker.pkg.dev/oplabs-tools-artifacts/images/da-server:devnet
@@ -210,6 +222,8 @@ services:
       - "3100:3100"
     volumes:
       - "da_data:/data"
+    networks:
+      - eth
 
   sentinel:
     image: quarry/sentinel # TODO(10141): We need a public image for this (sentinel is out of repo)
@@ -224,6 +238,8 @@ services:
       --da-storage-uri=http://da-server:3100
       --private-key=0x8b3a350cf5c34c9194ca85829a2df0ec3153be0318b5e2d3348e872092edffba
       --config=/rollup.json
+    networks:
+      - eth
 
   artifact-server:
     depends_on:
@@ -235,3 +251,10 @@ services:
       - "${PWD}/../.devnet/:/usr/share/nginx/html/:ro"
     security_opt:
       - "no-new-privileges:true"
+    networks:
+      - eth
+
+networks:
+  eth:
+    name: eth
+
